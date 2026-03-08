@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customers &mdash; THREAD</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Thread</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="orders.html">Orders</a></li>
+      <li><a href="customers.html" class="active">Customers</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-layout">
+
+    <!-- ADD CUSTOMER FORM -->
+    <aside class="form-panel">
+      <p class="panel-eyebrow">Customer Management</p>
+      <h1 class="panel-title">Add Customer</h1>
+      <p class="panel-subtitle">Register a new shopper. Email is used as the unique identifier per the database schema.</p>
+
+      <form id="add-customer-form" novalidate>
+
+        <div class="form-group">
+          <label for="firstName">First Name <span class="required-star">*</span></label>
+          <input type="text" id="firstName" placeholder="e.g. Jane"/>
+          <p class="field-error" id="firstName-error">First name is required.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Last Name <span class="required-star">*</span></label>
+          <input type="text" id="lastName" placeholder="e.g. Smith"/>
+          <p class="field-error" id="lastName-error">Last name is required.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address <span class="required-star">*</span></label>
+          <input type="email" id="email" placeholder="e.g. jane@university.edu"/>
+          <p class="field-error" id="email-error">A valid email address is required.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" placeholder="e.g. 123 Main St, Miami, FL"/>
+        </div>
+
+        <div class="form-group">
+          <label>Membership</label>
+          <label class="checkbox-group">
+            <input type="checkbox" id="member"/>
+            <div>
+              <span class="checkbox-label">Enroll as Member</span>
+              <span class="checkbox-desc">Members receive exclusive discounts and early access.</span>
+            </div>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Add Customer</button>
+        <div class="toast" id="toast"></div>
+      </form>
+    </aside>
+
+    <!-- CUSTOMERS TABLE -->
+    <main class="table-panel">
+      <div class="panel-header">
+        <div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;">All Customers</h2>
+          <p style="font-size:13px;color:var(--muted);margin-top:4px;" id="customer-count">4 registered customers</p>
+        </div>
+        <input class="search-box" type="text" placeholder="Search by name or email..." oninput="searchCustomers(this.value)"/>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Address</th>
+            <th>Member</th>
+          </tr>
+        </thead>
+        <tbody id="customers-body"></tbody>
+      </table>
+    </main>
+
+  </div>
+
+  <footer>
+    <div class="footer-logo">Thread</div>
+    <p>COP 4710 &mdash; Database Final Project</p>
+    <p>Skyler &middot; Rachelle &middot; Jayden &middot; Sabrina</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
