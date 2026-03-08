@@ -9,4 +9,10 @@ VALUES
 INSERT INTO customers (first_name, last_name, email)
 VALUES
 ('Maria', 'Lopez', 'maria@email.com'),
-('John', 'Smith', 'john@email.com');
+('John', 'Smith', 'john@email.com'),
+
+
+-- Null value tests
+('', 'Cordal', 'heather@email.com'),
+('Nathan', '', 'nathan@email.com'),
+('Katy', 'Mathers', '');
