@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
   <nav>
     <a href="index.html" class="nav-logo">Thread</a>
     <ul class="nav-links">
@@ -17,34 +16,15 @@
       <li><a href="customers.html">Customers</a></li>
     </ul>
   </nav>
-
   <div class="page-header">
     <h1 class="page-title">Orders</h1>
   </div>
-
   <div class="summary-cards">
-    <div class="summary-card">
-      <div class="summary-label">Total Orders</div>
-      <div class="summary-value">5</div>
-      <div class="summary-sub">All time</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Pending</div>
-      <div class="summary-value">2</div>
-      <div class="summary-sub">Awaiting shipment</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Delivered</div>
-      <div class="summary-value">2</div>
-      <div class="summary-sub">Completed</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-label">Revenue</div>
-      <div class="summary-value">$822</div>
-      <div class="summary-sub">Total amount</div>
-    </div>
+    <div class="summary-card"><div class="summary-label">Total Orders</div><div class="summary-value">5</div><div class="summary-sub">All time</div></div>
+    <div class="summary-card"><div class="summary-label">Pending</div><div class="summary-value">2</div><div class="summary-sub">Awaiting shipment</div></div>
+    <div class="summary-card"><div class="summary-label">Delivered</div><div class="summary-value">2</div><div class="summary-sub">Completed</div></div>
+    <div class="summary-card"><div class="summary-label">Revenue</div><div class="summary-value">$822</div><div class="summary-sub">Total amount</div></div>
   </div>
-
   <div class="filters" style="padding: 0 60px 32px;">
     <span class="filter-label">Status:</span>
     <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
@@ -53,36 +33,24 @@
     <button class="filter-btn" onclick="filterOrders('delivered', this)">Delivered</button>
     <button class="filter-btn" onclick="filterOrders('cancelled', this)">Cancelled</button>
   </div>
-
   <div class="table-section">
     <table>
       <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Customer Email</th>
-          <th>Order Date</th>
-          <th>Status</th>
-          <th>Shipping Address</th>
-          <th>Total</th>
-        </tr>
+        <tr><th>Order ID</th><th>Customer Email</th><th>Order Date</th><th>Status</th><th>Shipping Address</th><th>Total</th></tr>
       </thead>
       <tbody id="orders-body"></tbody>
     </table>
   </div>
-
-  <!-- ORDER DETAIL DRAWER -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
   <div class="drawer" id="drawer">
     <button class="drawer-close" onclick="closeDrawer()">&#x2715;</button>
     <div id="drawer-content"></div>
   </div>
-
   <footer>
     <div class="footer-logo">Thread</div>
     <p>COP 4710 &mdash; Database Final Project</p>
     <p>Skyler &middot; Rachelle &middot; Jayden &middot; Sabrina</p>
   </footer>
-
   <script src="app.js"></script>
 </body>
 </html>

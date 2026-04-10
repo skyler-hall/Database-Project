@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-
   <nav>
     <a href="index.html" class="nav-logo">Thread</a>
     <ul class="nav-links">
@@ -17,12 +16,10 @@
       <li><a href="customers.html">Customers</a></li>
     </ul>
   </nav>
-
   <div class="page-header">
     <h1 class="page-title">Products</h1>
     <p id="product-count">Showing 6 items</p>
   </div>
-
   <div class="filters">
     <span class="filter-label">Filter:</span>
     <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
@@ -32,33 +29,24 @@
     <button class="filter-btn" onclick="filterProducts('accessories', this)">Accessories</button>
     <input class="search-box" type="text" placeholder="Search products..." oninput="searchProducts(this.value)"/>
   </div>
-
   <div class="products-grid" id="products-grid"></div>
-
   <div class="table-section">
     <p class="section-label">Product Variants Table</p>
     <table>
       <thead>
         <tr>
-          <th>Variant ID</th>
-          <th>Product ID</th>
-          <th>Product Name</th>
-          <th>Size</th>
-          <th>Color</th>
-          <th>Stock Qty</th>
-          <th>Unit Price</th>
+          <th>Variant ID</th><th>Product ID</th><th>Product Name</th>
+          <th>Size</th><th>Color</th><th>Stock Qty</th><th>Unit Price</th>
         </tr>
       </thead>
       <tbody id="variants-body"></tbody>
     </table>
   </div>
-
   <footer>
     <div class="footer-logo">Thread</div>
     <p>COP 4710 &mdash; Database Final Project</p>
     <p>Skyler &middot; Rachelle &middot; Jayden &middot; Sabrina</p>
   </footer>
-
   <script src="app.js"></script>
 </body>
 </html>

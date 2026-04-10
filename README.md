@@ -1,23 +1,35 @@
-# Clothing Store Database Application
+# THREAD — Clothing Store Database Application
 
 ## Overview
 
-This project is a simple database application for managing clothing store data. It uses a MySQL databaseand a Flask backend written in Python to retrieve and insert records. A basic frontend interface is included to display and interact with the data.
+THREAD is a relational database application for managing a clothing store.
+It uses a MySQL database, a Python Flask backend, and an HTML/CSS/JavaScript frontend.
+
+**COP 4710 — Database Final Project | Group 37**
+Skyler · Rachelle · Jayden · Sabrina
+
+---
 
 ## Technologies
 
-* Python (Flask)
-* MySQL
-* HTML / CSS / JavaScript
+- Python 3 (Flask, mysql-connector-python, flask-cors)
+- MySQL 8.0+
+- HTML / CSS / JavaScript (vanilla)
+
+---
 
 ## Project Structure
 
-Database-Project
+```
+final_project/
 │
-├── backend
+├── report.pdf
+├── README.md
+│
+├── backend/
 │   └── app.py
 │
-├── frontend
+├── frontend/
 │   ├── index.html
 │   ├── products.html
 │   ├── customers.html
@@ -25,35 +37,107 @@ Database-Project
 │   ├── style.css
 │   └── app.js
 │
-├── schema.sql
-├── data.sql
-└── README.md
+└── db_proof/
+    ├── schema.sql
+    ├── data.sql
+    ├── constraints_test.sql
+    ├── queries.sql
+    └── query_outputs.txt
+```
+
+---
 
 ## Setup Instructions
 
 ### 1. Create the database
 
-Run the following SQL files in MySQL:
-schema.sql
-data.sql
+Open MySQL and run the two SQL files in order:
 
-This will create the tables and insert sample data.
+```sql
+source db_proof/schema.sql
+source db_proof/data.sql
+```
 
-### 2. Install dependencies
+This creates the `clothing_store` database with all 4 tables, the
+`order_summary` view, the `trg_update_order_total` trigger, and
+inserts sample data.
 
-Install the required Python packages:
-pip install flask mysql-connector-python
+### 2. Install Python dependencies
 
-### 3. Run the backend server
+```bash
+pip install flask mysql-connector-python flask-cors
+```
 
-Navigate to the backend folder and start the Flask application: python app.py
-The server will run at:
-### http://127.0.0.1:5000/
+### 3. Configure database credentials
+
+Open `backend/app.py` and update the connection block if needed:
+
+```python
+connection = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",        # set your MySQL password here
+    database="clothing_store"
+)
+```
+
+### 4. Run the backend server
+
+```bash
+cd backend
+python app.py
+```
+
+The API will be available at: **http://127.0.0.1:5000/**
+
+### 5. Open the frontend
+
+Open `frontend/index.html` in a browser. The frontend will
+automatically connect to the running Flask server.
+
+---
 
 ## API Endpoints
 
-Get all products
-GET /products
+| Method | Endpoint                  | Description                          |
+|--------|---------------------------|--------------------------------------|
+| GET    | /products                 | All products (Query 1)               |
+| GET    | /products/low-stock       | Products below avg stock (Query 6)   |
+| GET    | /products/\<id\>          | Single product by ID                 |
+| POST   | /products                 | Add a new product                    |
+| PUT    | /products/\<id\>          | Update a product                     |
+| DELETE | /products/\<id\>          | Delete a product                     |
+| GET    | /customers                | All customers with membership (Q2)   |
+| GET    | /customers/stats          | Revenue per customer (Query 5)       |
+| POST   | /customers                | Add a new customer                   |
+| GET    | /orders                   | All orders with customer name (Q3)   |
+| GET    | /orders/summary           | Order summary via VIEW (Query 7)     |
+| GET    | /orders/\<id\>            | Full order detail with items (Q4)    |
+| PUT    | /orders/\<id\>/status     | Update order status (Query 8)        |
+| POST   | /orders                   | Create order (transaction-wrapped)   |
 
-Add a customer
-POST /customers
+---
+
+## Advanced Database Features
+
+**View — `order_summary`**
+Joins orders, customers, and order_items into a denormalized summary
+used by GET /orders/summary. Defined in schema.sql.
+
+**Trigger — `trg_update_order_total`**
+Fires AFTER INSERT on order_items. Automatically recalculates and
+updates orders.total_amount so it always reflects the real line-item
+sum without manual calculation in the application layer.
+
+**Transaction — POST /orders**
+The order creation endpoint wraps the orders INSERT and all
+order_items INSERTs in a single transaction. If any insert fails,
+the entire order is rolled back.
+
+---
+
+## Constraint Tests
+
+Run `db_proof/constraints_test.sql` after loading the schema and data
+to verify that all constraints are enforced. Each statement is designed
+to fail with a specific error (NOT NULL, UNIQUE, CHECK, FOREIGN KEY).

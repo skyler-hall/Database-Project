@@ -6,7 +6,7 @@
 
 /* -----------------------------------------------
    PLACEHOLDER DATA
-   (Replace fetch() calls below when backend ready)
+   (fetch() calls below connect to Flask backend)
    ----------------------------------------------- */
 
 const PRODUCTS = [
@@ -71,7 +71,7 @@ const ORDERS = [
   {
     order_id: 1001, customer_email: "jsmith@email.com",
     order_date: "2025-03-01", status: "delivered",
-    shipping_address: "123 Oak Ave, Miami, FL", total_amount: 147.00,
+    shipping_address: "123 Oak Ave, Miami, FL", total_amount: 164.00,
     items: [
       { product_id: 1, product_name: "Classic Oxford Shirt", quantity: 1, unit_price: 58.00 },
       { product_id: 2, product_name: "Slim Chino Pants",     quantity: 1, unit_price: 72.00 },
@@ -97,7 +97,7 @@ const ORDERS = [
   {
     order_id: 1004, customer_email: "tchen@email.com",
     order_date: "2025-03-05", status: "pending",
-    shipping_address: "321 Bay Blvd, Naples, FL", total_amount: 189.00,
+    shipping_address: "321 Bay Blvd, Naples, FL", total_amount: 187.00,
     items: [
       { product_id: 6, product_name: "High-Waist Denim",     quantity: 1, unit_price: 95.00 },
       { product_id: 5, product_name: "Canvas Tote Bag",      quantity: 1, unit_price: 34.00 },
@@ -107,7 +107,7 @@ const ORDERS = [
   {
     order_id: 1005, customer_email: "jsmith@email.com",
     order_date: "2025-03-06", status: "delivered",
-    shipping_address: "123 Oak Ave, Miami, FL", total_amount: 113.00,
+    shipping_address: "123 Oak Ave, Miami, FL", total_amount: 161.00,
     items: [
       { product_id: 2, product_name: "Slim Chino Pants",    quantity: 1, unit_price: 72.00 },
       { product_id: 4, product_name: "Ribbed Knit Sweater", quantity: 1, unit_price: 89.00 },
@@ -148,9 +148,9 @@ function renderProductCards(data) {
   }
 
   grid.innerHTML = data.map(p => {
-    const stock     = getStockStatus(p.variants);
-    const sizeTags  = [...new Set(p.variants.map(v => v.size))]
-                        .map(s => `<span class="variant-tag">${s}</span>`).join('');
+    const stock    = getStockStatus(p.variants);
+    const sizeTags = [...new Set(p.variants.map(v => v.size))]
+                       .map(s => `<span class="variant-tag">${s}</span>`).join('');
     return `
       <div class="product-card" data-category="${p.category.toLowerCase()}">
         <div class="product-category">${p.category}</div>
@@ -202,7 +202,6 @@ function searchProducts(query) {
   renderVariantsTable(result);
 }
 
-/* Init products page */
 if (document.getElementById('products-grid')) {
   renderProductCards(PRODUCTS);
   renderVariantsTable(PRODUCTS);
@@ -239,7 +238,6 @@ function searchCustomers(query) {
   ));
 }
 
-/* Reusable field validator — clears then re-applies error state */
 function validateField(id, isValid, message) {
   const input = document.getElementById(id);
   const error = document.getElementById(id + '-error');
@@ -253,18 +251,17 @@ function validateField(id, isValid, message) {
   return isValid;
 }
 
-/* Customer form submission */
 const customerForm = document.getElementById('add-customer-form');
 if (customerForm) {
   customerForm.addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName  = document.getElementById('lastName').value.trim();
-    const email     = document.getElementById('email').value.trim();
-    const address   = document.getElementById('address').value.trim();
-    const member    = document.getElementById('member').checked;
-    const toast     = document.getElementById('toast');
+    const firstName  = document.getElementById('firstName').value.trim();
+    const lastName   = document.getElementById('lastName').value.trim();
+    const email      = document.getElementById('email').value.trim();
+    const address    = document.getElementById('address').value.trim();
+    const member     = document.getElementById('member').checked;
+    const toast      = document.getElementById('toast');
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const valid =
@@ -285,31 +282,57 @@ if (customerForm) {
       return;
     }
 
-    /* Add locally (swap for POST /customers when backend ready) */
-    CUSTOMERS.push({ email, firstName, lastName, address, member });
-    renderCustomersTable(CUSTOMERS);
-    customerForm.reset();
-
-    toast.className = 'toast success';
-    toast.textContent = `${firstName} ${lastName} has been added successfully.`;
-
-    /*
-    === SWAP FOR REAL API WHEN BACKEND IS READY ===
+    /* Live backend call — POST /customers */
     fetch('http://localhost:5000/customers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, firstName, lastName, address, member })
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name:  lastName,
+        email:      email,
+        address:    address || null,
+        member:     member
+      })
     })
     .then(r => r.json())
-    .then(() => { CUSTOMERS.push(...); renderCustomersTable(CUSTOMERS); })
-    .catch(() => { toast.className = 'toast error-toast'; toast.textContent = 'Server error. Try again.'; });
-    */
+    .then(data => {
+      if (data.error) {
+        toast.className = 'toast error-toast';
+        toast.textContent = data.error;
+        return;
+      }
+      CUSTOMERS.push({ email, firstName, lastName, address, member });
+      renderCustomersTable(CUSTOMERS);
+      customerForm.reset();
+      toast.className = 'toast success';
+      toast.textContent = `${firstName} ${lastName} has been added successfully.`;
+    })
+    .catch(() => {
+      /* Fallback to local if backend not running */
+      CUSTOMERS.push({ email, firstName, lastName, address, member });
+      renderCustomersTable(CUSTOMERS);
+      customerForm.reset();
+      toast.className = 'toast success';
+      toast.textContent = `${firstName} ${lastName} added (offline mode).`;
+    });
   });
 }
 
-/* Init customers page */
 if (document.getElementById('customers-body')) {
-  renderCustomersTable(CUSTOMERS);
+  /* Try live backend first, fall back to placeholder */
+  fetch('http://localhost:5000/customers')
+    .then(r => r.json())
+    .then(data => {
+      CUSTOMERS = data.map(c => ({
+        email:     c.email,
+        firstName: c.first_name,
+        lastName:  c.last_name,
+        address:   c.address,
+        member:    c.membership === 'Member'
+      }));
+      renderCustomersTable(CUSTOMERS);
+    })
+    .catch(() => renderCustomersTable(CUSTOMERS));
 }
 
 
@@ -324,11 +347,11 @@ function renderOrdersTable(data) {
   tbody.innerHTML = data.map(o => `
     <tr onclick="openDrawer(${o.order_id})">
       <td>#${o.order_id}</td>
-      <td>${o.customer_email}</td>
+      <td>${o.customer_email || o.email || ''}</td>
       <td>${o.order_date}</td>
       <td><span class="status-badge status-${o.status}">${capitalize(o.status)}</span></td>
-      <td>${o.shipping_address}</td>
-      <td>$${o.total_amount.toFixed(2)}</td>
+      <td>${o.shipping_address || '-'}</td>
+      <td>$${parseFloat(o.total_amount).toFixed(2)}</td>
     </tr>`).join('');
 }
 
@@ -345,21 +368,21 @@ function openDrawer(id) {
   document.getElementById('drawer-content').innerHTML = `
     <div class="drawer-title">Order #${order.order_id}</div>
     <div class="drawer-subtitle">
-      ${order.order_date} &nbsp;·&nbsp;
+      ${order.order_date} &nbsp;&middot;&nbsp;
       <span class="status-badge status-${order.status}">${capitalize(order.status)}</span>
     </div>
-    <div class="detail-row"><span class="detail-label">Customer</span><span>${order.customer_email}</span></div>
-    <div class="detail-row"><span class="detail-label">Shipping Address</span><span>${order.shipping_address}</span></div>
+    <div class="detail-row"><span class="detail-label">Customer</span><span>${order.customer_email || order.email || ''}</span></div>
+    <div class="detail-row"><span class="detail-label">Shipping Address</span><span>${order.shipping_address || '-'}</span></div>
     <div class="detail-row">
       <span class="detail-label">Total Amount</span>
-      <span style="font-family:'Cormorant Garamond',serif;font-size:20px;">$${order.total_amount.toFixed(2)}</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:20px;">$${parseFloat(order.total_amount).toFixed(2)}</span>
     </div>
     <div class="items-title">Order Items</div>
-    ${order.items.map(item => `
+    ${(order.items || []).map(item => `
       <div class="order-item-row">
         <div>
           <div class="item-name">${item.product_name}</div>
-          <div class="item-meta">Product ID: ${item.product_id} &nbsp;·&nbsp; Qty: ${item.quantity}</div>
+          <div class="item-meta">Product ID: ${item.product_id} &nbsp;&middot;&nbsp; Qty: ${item.quantity}</div>
         </div>
         <div class="item-price">$${(item.unit_price * item.quantity).toFixed(2)}</div>
       </div>`).join('')}
@@ -374,33 +397,9 @@ function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
 }
 
-/* Init orders page */
 if (document.getElementById('orders-body')) {
-  renderOrdersTable(ORDERS);
+  fetch('http://localhost:5000/orders')
+    .then(r => r.json())
+    .then(data => renderOrdersTable(data))
+    .catch(() => renderOrdersTable(ORDERS));
 }
-
-
-/* -----------------------------------------------
-   FUTURE API CALLS (uncomment when backend ready)
-   -----------------------------------------------
-
-async function loadProducts() {
-  const res  = await fetch('http://localhost:5000/products');
-  const data = await res.json();
-  renderProductCards(data);
-  renderVariantsTable(data);
-}
-
-async function loadCustomers() {
-  const res  = await fetch('http://localhost:5000/customers');
-  const data = await res.json();
-  renderCustomersTable(data);
-}
-
-async function loadOrders() {
-  const res  = await fetch('http://localhost:5000/orders');
-  const data = await res.json();
-  renderOrdersTable(data);
-}
-
------------------------------------------------ */
